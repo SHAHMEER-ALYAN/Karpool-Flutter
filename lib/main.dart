@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'signup.dart';
 
 void main() {
   runApp(MyApp());
 }
 
+TextEditingController nameController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
+
 class MyApp extends StatelessWidget {
+
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,7 +27,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late bool rememberMe = false;
+
+  bool rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(height: 100),
+              const SizedBox(height: 80),
               Image.asset('assets/logo.png', width: 200, height: 200),
               Text("KARPOOL",style: TextStyle(color: Colors.white,
               fontSize: 32,
@@ -62,9 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Color hexToColor(String hexColor) {
-    return Color(int.parse(hexColor.substring(1, 7), radix: 16) + 0xFF000000);
-  }
+
 
   Widget loginBox() {
     return Container(
@@ -77,48 +83,58 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text("Phone Number",style:
-          TextStyle(color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18
-          ),),
-          TextField(  decoration: InputDecoration(hintText: "Enter Phone Number",
+          Align(
+            alignment: Alignment.centerLeft,
+            child: const Text("Phone Number",style:
+            TextStyle(color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18
+            ),
+            ),
+          ),
+          TextField(
+              controller: nameController ,decoration: InputDecoration(hintText: "Enter Phone Number",
               hintStyle: TextStyle(color: hexToColor("#777777")),
               border: const UnderlineInputBorder( borderSide: BorderSide(color: Colors.black))
           )
           ),
           const SizedBox(height: 20,),
-          const Text("Password",style: TextStyle(color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: const Text("Password",style: TextStyle(color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,),
+            ),
           ),
-          TextField(  decoration: InputDecoration(hintText: "Enter Password",
+          TextField(controller: passwordController,  decoration: InputDecoration(hintText: "Enter Password",
               hintStyle: TextStyle(color: hexToColor('#777777')),
               border: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black,))
           ),
           ),
-          Container(
-            alignment: Alignment.center,
-            child:
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Checkbox(
-                value: rememberMe,
-                onChanged: (newValue) {
-                  setState(() {
-                    rememberMe = newValue ?? false;
-                  });
-                },
-                activeColor: hexToColor("#1e847f"),
-              ),
-              const Text("Remember Me",style: TextStyle(color: Colors.white,
-                  fontSize: 18,
-              fontWeight: FontWeight.bold)),
-            ],
+          Align(alignment: Alignment.center,
+              child: TextButton(onPressed: () {},
+                  child: Text("Forget Password?",
+                    style: TextStyle(color: hexToColor("#1E847F"),
+                        fontWeight: FontWeight.bold),),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.only(top: 15),)
+              )
           ),
-          ),
-          ElevatedButton(onPressed: () {  },
+          checkboxWidget(),
+          ElevatedButton(onPressed: () {
+
+            if(nameController.text=="123456" && passwordController.text == "123456"){
+            Navigator.push(context,
+            MaterialPageRoute(builder: (context) => Signup()),
+          );
+            }else{
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("INVALID CREDENTIALS"),
+                  duration:Duration(seconds: 2),)
+              );
+            }
+
+          },
           child: const Text("LOGIN"),
             style: ElevatedButton.styleFrom(
               backgroundColor: hexToColor("#1E847F"),
@@ -132,4 +148,38 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  Widget checkboxWidget() {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Checkbox(
+            value: rememberMe,
+            onChanged: (newValue) {
+              setState(() {
+                rememberMe = newValue ?? false;
+              });
+            },
+            activeColor: hexToColor("#1e847f"),
+          ),
+          const SizedBox(width: 6), // Adjust the width as needed
+          const Text(
+            "Remember Me",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
+
+Color hexToColor(String hexColor) {
+  return Color(int.parse(hexColor.substring(1, 7), radix: 16) + 0xFF000000);
+}
+
