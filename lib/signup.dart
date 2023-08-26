@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
 
+
 void main(){
   runApp(Signup());
 }
@@ -30,7 +31,14 @@ class SignupPage extends StatelessWidget{
                     icon: Image.asset("assets/user.png")),
               ),
               SizedBox(height: 20,),
-                signupInfo()
+                signupInfo(),
+                SizedBox(height: 20,),
+                ElevatedButton(onPressed: () {}, child: Text("Create Account"),
+                style: ElevatedButton.styleFrom(backgroundColor: hexToColor("#1E847F"),
+                fixedSize: Size(130, 40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)
+                )),)
             ],
           ),
         ),
@@ -44,15 +52,60 @@ Widget signupInfo(){
     padding: EdgeInsets.all(20),
     margin: EdgeInsets.symmetric(horizontal: 40),
     decoration: BoxDecoration(
-      color: hexToColor("#1e1e1e")
+        borderRadius: BorderRadius.circular(20),
+        color: hexToColor('#1e1e1e')
     ),
     child: Column(
     children: [
-      Text("Full Name",style: TextStyle(color: Colors.white),),
-      TextField(decoration: InputDecoration(
-        hintText: "Enter Full Name"
-      ),)
+      Align(
+        alignment: Alignment.centerLeft,
+          child: Text("Full Name",
+        style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+      )
+      ),
+      TextField(decoration: textfieldstyle("Enter Full Name"),
+      ),
+      SizedBox(height: 20,),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Text("Phone Number",
+        style: textstyle(),
+        ),
+      ),
+      TextField(decoration: textfieldstyle("Enter Phone Number"),),
+      SizedBox(height: 20,),
+      Align(
+          alignment: Alignment.centerLeft,
+          child: Text("Email",style: textstyle(),)
+      ),
+      TextField(decoration: textfieldstyle("Enter Email")
+      ),
+      SizedBox(height: 20,),
+      Align(alignment: Alignment.centerLeft,
+      child: Text("Password",style: textstyle(),
+      ),
+      ),
+      TextField(decoration: textfieldstyle("Enter Password")),
+      SizedBox(height: 20,),
+      Align(
+          alignment: Alignment.centerLeft,
+          child: Text("Confirm Password",style: textstyle(),)
+      ),
+      TextField(decoration: textfieldstyle("Confirm Password"),
+      )
     ],
   ),
   );
+}
+
+TextStyle textstyle(){
+  return TextStyle(color: Colors.white,fontWeight: FontWeight.bold);
+}
+
+InputDecoration textfieldstyle(String abc){
+  return InputDecoration(
+    enabledBorder: UnderlineInputBorder(
+      borderSide: BorderSide(width: 3)),hintText: abc,
+      hintStyle: TextStyle(color: hexToColor("#777777"))
+    );
 }
