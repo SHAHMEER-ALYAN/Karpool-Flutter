@@ -27,7 +27,11 @@ class SignupPage extends StatelessWidget{
               children: [SizedBox(
                 height: 200,
                 width: 200,
-                child: IconButton(onPressed: () {},
+                child: IconButton(onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Funcationality to be added"),
+                        duration:Duration(seconds: 2),));
+                },
                     icon: Image.asset("assets/user.png")),
               ),
               SizedBox(height: 20,),
