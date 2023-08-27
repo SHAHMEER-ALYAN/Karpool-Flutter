@@ -1,12 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'main.dart';
+import 'package:http/http.dart' as http;
 
 
 void main(){
   runApp(Signup());
 }
 
+TextEditingController name = TextEditingController();
+TextEditingController phone = TextEditingController();
+TextEditingController email = TextEditingController();
+TextEditingController password = TextEditingController();
+
 class Signup extends StatelessWidget{
+
+
+
   @override
   Widget build(BuildContext context) {
    return MaterialApp(
@@ -16,13 +27,48 @@ class Signup extends StatelessWidget{
 }
 
 class SignupPage extends StatelessWidget{
+
+  Future<void> insertrecord() async
+  {
+    if(name.text!=""||email.text!=""||password.text!=""||phone.text!=""){
+      try{
+        print(name.text);
+        print(email.text);
+        print(password.text);
+        print(phone.text);
+
+        String uri = "http://10.0.2.2/practice_api/insert_record.php";
+
+        var res = await http.post(Uri.parse(uri),body: {
+          "name":name.text,
+          "password":password.text,
+          "phone":phone.text,
+          "email":email.text
+
+          }
+        );
+        var response=jsonDecode(res.body);
+        if(response["success"] == "true"){
+          print("Record insert successfully");
+        }else{
+          print("some problem");
+        }
+      }
+
+      catch(e){
+        print(e);
+      }
+      }else{
+      print("please fill alll fields");
+      }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: hexToColor("#121212"),
       body: Container(
-        padding: EdgeInsets.only(top: 100),
-        child: Center(
+                child: Center(
           child: Column(
               children: [SizedBox(
                 height: 200,
@@ -37,7 +83,9 @@ class SignupPage extends StatelessWidget{
               SizedBox(height: 20,),
                 signupInfo(),
                 SizedBox(height: 20,),
-                ElevatedButton(onPressed: () {}, child: Text("Create Account"),
+                ElevatedButton(onPressed: () {
+                  insertrecord();
+                }, child: Text("Create Account"),
                 style: ElevatedButton.styleFrom(backgroundColor: hexToColor("#1E847F"),
                 fixedSize: Size(130, 40),
                 shape: RoundedRectangleBorder(
@@ -67,7 +115,9 @@ Widget signupInfo(){
         style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
       )
       ),
-      TextField(decoration: textfieldstyle("Enter Full Name"),
+      TextField(
+        controller: name,
+          decoration: textfieldstyle("Enter Full Name"),
       ),
       SizedBox(height: 20,),
       Align(
@@ -76,20 +126,26 @@ Widget signupInfo(){
         style: textstyle(),
         ),
       ),
-      TextField(decoration: textfieldstyle("Enter Phone Number"),),
+      TextField(
+        controller: phone,
+        decoration: textfieldstyle("Enter Phone Number"),),
       SizedBox(height: 20,),
       Align(
           alignment: Alignment.centerLeft,
           child: Text("Email",style: textstyle(),)
       ),
-      TextField(decoration: textfieldstyle("Enter Email")
+      TextField(
+          controller: email,
+          decoration: textfieldstyle("Enter Email")
       ),
       SizedBox(height: 20,),
       Align(alignment: Alignment.centerLeft,
       child: Text("Password",style: textstyle(),
       ),
       ),
-      TextField(decoration: textfieldstyle("Enter Password")),
+      TextField(
+          controller: password,
+          decoration: textfieldstyle("Enter Password")),
       SizedBox(height: 20,),
       Align(
           alignment: Alignment.centerLeft,
