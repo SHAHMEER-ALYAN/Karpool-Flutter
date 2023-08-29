@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'signup.dart';
+import 'home.dart';
 
 void main() {
   runApp(MyApp());
@@ -46,13 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
               fontSize: 32,
               fontWeight: FontWeight.bold),),
               loginBox(),
-              Container(
-                margin: EdgeInsets.all(20),
-                child: const Text("OR",style: TextStyle(color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
-                ),
-              ),
+              SizedBox(height:20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: hexToColor("#1E847F"),
@@ -61,7 +56,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   fixedSize: Size(180, 40)
                 ),
-                  onPressed: (){},
+                  onPressed: () {
+
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Signup()));
+                  // MaterialPageRoute(builder: (context) => Signup())
+
+                  },
                   child:Text("SIGN UP"))
             ],
           ),
@@ -106,7 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
               fontSize: 18,),
             ),
           ),
-          TextField(controller: passwordController,  decoration: InputDecoration(hintText: "Enter Password",
+          TextField(controller: passwordController,
+              decoration: InputDecoration(hintText: "Enter Password",
               hintStyle: TextStyle(color: hexToColor('#777777')),
               border: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black,))
           ),
@@ -125,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
             if(nameController.text=="123456" && passwordController.text == "123456"){
             Navigator.push(context,
-            MaterialPageRoute(builder: (context) => Signup()),
+            MaterialPageRoute(builder: (context) => home()),
           );
             }else{
               ScaffoldMessenger.of(context).showSnackBar(

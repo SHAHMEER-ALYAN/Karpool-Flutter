@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 
 void main(){
-  runApp(Signup());
+  runApp(const Signup());
 }
 
 TextEditingController name = TextEditingController();
@@ -15,6 +15,8 @@ TextEditingController email = TextEditingController();
 TextEditingController password = TextEditingController();
 
 class Signup extends StatelessWidget{
+  const Signup({super.key});
+
 
 
 
@@ -27,6 +29,8 @@ class Signup extends StatelessWidget{
 }
 
 class SignupPage extends StatelessWidget{
+  const SignupPage({super.key});
+
 
   Future<void> insertrecord() async
   {
@@ -37,9 +41,10 @@ class SignupPage extends StatelessWidget{
         print(password.text);
         print(phone.text);
 
-        String uri = "http://10.0.2.2/practice_api/insert_record.php";
+       String uri = "http://10.0.2.2/practice_api/insert_record.php";
 
         var res = await http.post(Uri.parse(uri),body: {
+
           "name":name.text,
           "password":password.text,
           "phone":phone.text,
@@ -47,7 +52,9 @@ class SignupPage extends StatelessWidget{
 
           }
         );
+
         var response=jsonDecode(res.body);
+
         if(response["success"] == "true"){
           print("Record insert successfully");
         }else{
@@ -75,19 +82,19 @@ class SignupPage extends StatelessWidget{
                 width: 200,
                 child: IconButton(onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Funcationality to be added"),
+                      const SnackBar(content: Text("Funcationality to be added"),
                         duration:Duration(seconds: 2),));
                 },
                     icon: Image.asset("assets/user.png")),
               ),
-              SizedBox(height: 20,),
+              const SizedBox(height: 20,),
                 signupInfo(),
-                SizedBox(height: 20,),
+                const SizedBox(height: 20,),
                 ElevatedButton(onPressed: () {
                   insertrecord();
-                }, child: Text("Create Account"),
+                }, child: const Text("Create Account"),
                 style: ElevatedButton.styleFrom(backgroundColor: hexToColor("#1E847F"),
-                fixedSize: Size(130, 40),
+                fixedSize: const Size(130, 40),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)
                 )),)
@@ -101,15 +108,15 @@ class SignupPage extends StatelessWidget{
 
 Widget signupInfo(){
   return Container(
-    padding: EdgeInsets.all(20),
-    margin: EdgeInsets.symmetric(horizontal: 40),
+    padding: const EdgeInsets.all(20),
+    margin: const EdgeInsets.symmetric(horizontal: 40),
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: hexToColor('#1e1e1e')
     ),
     child: Column(
     children: [
-      Align(
+      const Align(
         alignment: Alignment.centerLeft,
           child: Text("Full Name",
         style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
@@ -119,7 +126,7 @@ Widget signupInfo(){
         controller: name,
           decoration: textfieldstyle("Enter Full Name"),
       ),
-      SizedBox(height: 20,),
+      const SizedBox(height: 20,),
       Align(
         alignment: Alignment.centerLeft,
         child: Text("Phone Number",
@@ -129,7 +136,7 @@ Widget signupInfo(){
       TextField(
         controller: phone,
         decoration: textfieldstyle("Enter Phone Number"),),
-      SizedBox(height: 20,),
+      const SizedBox(height: 20,),
       Align(
           alignment: Alignment.centerLeft,
           child: Text("Email",style: textstyle(),)
@@ -138,7 +145,7 @@ Widget signupInfo(){
           controller: email,
           decoration: textfieldstyle("Enter Email")
       ),
-      SizedBox(height: 20,),
+      const SizedBox(height: 20,),
       Align(alignment: Alignment.centerLeft,
       child: Text("Password",style: textstyle(),
       ),
@@ -146,7 +153,7 @@ Widget signupInfo(){
       TextField(
           controller: password,
           decoration: textfieldstyle("Enter Password")),
-      SizedBox(height: 20,),
+      const SizedBox(height: 20,),
       Align(
           alignment: Alignment.centerLeft,
           child: Text("Confirm Password",style: textstyle(),)
@@ -159,12 +166,12 @@ Widget signupInfo(){
 }
 
 TextStyle textstyle(){
-  return TextStyle(color: Colors.white,fontWeight: FontWeight.bold);
+  return const TextStyle(color: Colors.white,fontWeight: FontWeight.bold);
 }
 
 InputDecoration textfieldstyle(String abc){
   return InputDecoration(
-    enabledBorder: UnderlineInputBorder(
+    enabledBorder: const UnderlineInputBorder(
       borderSide: BorderSide(width: 3)),hintText: abc,
       hintStyle: TextStyle(color: hexToColor("#777777"))
     );
