@@ -7,9 +7,14 @@ import "package:toggle_switch/toggle_switch.dart";
 void main() {
   runApp(home());
 }
-
+var startLocationCo;
 TextEditingController startlocation = TextEditingController();
 TextEditingController endlocation = TextEditingController();
+double startLat = 24.8674;
+double startLong = 67.1962;
+// double? startLat;
+// double? startLong;
+String? startName;
 bool show=false;
 LatLng locationTesting1 = LatLng(24.8674, 67.1962);
 
@@ -33,8 +38,10 @@ class _MyHomePageState extends State<MyHomePage> {
   bool showSecondBox = false;
   int _currentIndex = 0;
 
+
   @override
   Widget build(BuildContext context) {
+    final location = ModalRoute.of(context)!.settings.arguments;
     return Scaffold(
       body: Container(
         child: Column(
@@ -80,14 +87,16 @@ class _MyHomePageState extends State<MyHomePage> {
     height: MediaQuery.of(context).size.height/1.8,
     width: MediaQuery.of(context).size.width,
     child: GoogleMap(
+      myLocationEnabled: true,
       initialCameraPosition: CameraPosition(
-        target: LatLng(24.86,67.19),
+        target: LatLng(24.8674,67.1962),
         zoom: 15,
       ),
+
       markers: {
         Marker(
             markerId: const MarkerId("marker1"),
-            position: const LatLng(24.8674,67.1962),
+            position: LatLng(24.8674,67.1962!),
             draggable: true,
             onDragEnd: (value){
               locationTesting1 = value;
@@ -120,6 +129,7 @@ Container locationBox(context){
               ,),
             Expanded(
                 child: TextField(
+                  autofocus: false,
                 controller: startlocation,
                 decoration: InputDecoration(
                 hintText: "Start Location",
@@ -127,9 +137,17 @@ Container locationBox(context){
                     color: Colors.grey
                  )
                ),
-                  onTap: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context)=>LocationScreen()));
+                  onTap: () async {
+                  startLocationCo = await Navigator.push(context,
+                      MaterialPageRoute(
+                          builder: (context)=>LocationScreen()));
+                          if(startLocationCo != null && startLocationCo.length == 3){
+                            startLat = startLocationCo[0];
+                            startLong = startLocationCo[1];
+                            startName = startLocationCo[2];
+                            startlocation.text= startName!;
+
+                          }
                   },
               )
             )
@@ -172,6 +190,7 @@ Container locationBox(context){
     ),
   );
 }
+
 
 Widget modeSelector(){
 
