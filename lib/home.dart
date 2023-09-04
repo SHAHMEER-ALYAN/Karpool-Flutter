@@ -1,4 +1,6 @@
+import 'location_screen.dart';
 import 'package:flutter/material.dart';
+import "package:google_maps_flutter/google_maps_flutter.dart";
 import "main.dart";
 import "package:toggle_switch/toggle_switch.dart";
 
@@ -9,6 +11,7 @@ void main() {
 TextEditingController startlocation = TextEditingController();
 TextEditingController endlocation = TextEditingController();
 bool show=false;
+LatLng locationTesting1 = LatLng(24.8674, 67.1962);
 
 
 class home extends StatelessWidget {
@@ -34,16 +37,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(image: AssetImage("assets/Capture.png"),
-          fit: BoxFit.cover)
-        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            Map(context),
             modeSelector(),
-            locationBox(),
-
+            locationBox(context),
+            // MapScreen()
           ],
         ),
       ),
@@ -74,7 +74,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Container locationBox(){
+
+  Container Map(context){
+  return Container(
+    height: MediaQuery.of(context).size.height/1.8,
+    width: MediaQuery.of(context).size.width,
+    child: GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: LatLng(24.86,67.19),
+        zoom: 15,
+      ),
+      markers: {
+        Marker(
+            markerId: const MarkerId("marker1"),
+            position: const LatLng(24.8674,67.1962),
+            draggable: true,
+            onDragEnd: (value){
+              locationTesting1 = value;
+            },
+        ),
+        const Marker(
+          markerId: MarkerId("marker2"),
+          position: LatLng(24.8674,67.1962),
+        )
+      },
+    ),
+  );
+  }
+
+Container locationBox(context){
   return Container(
     decoration: BoxDecoration(
       color: hexToColor("#1E1E1E"),
@@ -90,15 +118,20 @@ Container locationBox(){
             Padding(padding: EdgeInsets.all(10),
             child: Icon(Icons.location_pin,color: Colors.red,)
               ,),
-            Expanded(child: TextField(
-              controller: startlocation,
-              decoration: InputDecoration(
+            Expanded(
+                child: TextField(
+                controller: startlocation,
+                decoration: InputDecoration(
                 hintText: "Start Location",
                 hintStyle: TextStyle(
-                  color: Colors.grey
-                )
-              ),
-            )
+                    color: Colors.grey
+                 )
+               ),
+                  onTap: () {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context)=>LocationScreen()));
+                  },
+              )
             )
           ],
           ),

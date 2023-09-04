@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'signup.dart';
 import 'home.dart';
+import 'homewithmap.dart';
 
 void main() {
   runApp(MyApp());
@@ -34,6 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
       backgroundColor: hexToColor("#121212"),
       body: Container(
         color: hexToColor('#121212'),
@@ -58,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                   onPressed: () {
 
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Signup()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Signup()));
                   // MaterialPageRoute(builder: (context) => Signup())
 
                   },
@@ -125,8 +127,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ElevatedButton(onPressed: () {
 
             if(nameController.text=="123456" && passwordController.text == "123456"){
-            Navigator.push(context,
-            MaterialPageRoute(builder: (context) => home()),
+            Navigator.push(
+              context,MaterialPageRoute(builder: (context) => home()),
           );
             }else{
               ScaffoldMessenger.of(context).showSnackBar(
