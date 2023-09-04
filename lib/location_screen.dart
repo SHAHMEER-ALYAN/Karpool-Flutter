@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:google_places_flutter/model/prediction.dart';
+import 'main.dart';
 
 class LocationScreen extends StatefulWidget {
   @override
@@ -8,57 +9,88 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  TextEditingController locationController = TextEditingController();
-  List<String> locationResults = [];
+  TextEditingController controller = TextEditingController();
+  double? selectedLatitude;
+  double? selectedLongitude;
+  String? selectedLocation;
+
 
   @override
   Widget build(BuildContext context) {
+    double hh = MediaQuery.of(context).size.height/5;
+
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Location Screen'),
-      ),
-      body: Column(
-        children: <Widget>[
-          TextField(
-            controller: locationController,
-            decoration: InputDecoration(
-              hintText: 'Enter a location',
-            ),
-            onChanged: (text) {
-              _searchLocation(text);
-            },
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: locationResults.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(locationResults[index]),
-                  onTap: () {
-                    // Handle selection of a location result here
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+      backgroundColor: hexToColor("#121212"),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            
+            SizedBox(height: hh),
+            placesAutoCompleteTextField(),
+          ],
+        ),
       ),
     );
   }
 
-  void _searchLocation(String query) async {
-    const apiUrl = 'com.google.android.geo.API_KEY';
-
-    final response = await http.get(Uri.parse(apiUrl));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['status'] == 'OK') {
-        setState(() {
-          locationResults =
-          List<String>.from(data['predictions'].map((result) => result['description']));
-        });
-      }
-    }
+  placesAutoCompleteTextField() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: GooglePlaceAutoCompleteTextField(
+        textEditingController: controller,
+        googleAPIKey: "AIzaSyD9aYD2LXsWn_Zx8rCSQ_DUPAjfoavM4lE", // Replace with your API key
+        textStyle: TextStyle(color: Colors.white),
+        inputDecoration: InputDecoration(
+          hintText: "Search your location",
+          hintStyle: TextStyle(color: Colors.white),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+        ),
+        debounceTime: 400,
+        countries: ["pk"],
+        isLatLngRequired: true, // Set this to true to get lat/lng
+        getPlaceDetailWithLatLng: (Prediction prediction) {
+          print("Latitude: ${prediction.lat}, Longitude: ${prediction.lng}");
+        },
+        itemClick: (Prediction prediction) {
+          controller.text = prediction.description ?? "";
+          controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: prediction.description?.length ?? 0));
+          selectedLatitude = prediction.lat as double?;
+          selectedLongitude = prediction.lng as double?;
+          selectedLocation = prediction.description;
+          if(selectedLocation!=null){
+          Navigator.pop(context,[selectedLatitude,selectedLongitude,selectedLocation]);
+          }
+        },
+        seperatedBuilder: Divider(
+          height: 5,
+          color: Colors.white,
+        ),
+        itemBuilder: (context, index, Prediction prediction) {
+          return Container(
+            decoration: BoxDecoration(
+              color: hexToColor("#121212")
+            ),
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Icon(Icons.location_pin, color: Colors.white,),
+                SizedBox(
+                  width: 10,
+                ),
+                Expanded(child: Text("${prediction.description ?? ""}",
+                style: TextStyle(color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold),))
+              ],
+            ),
+          );
+        },
+        isCrossBtnShown: true,
+      ),
+    );
   }
 }
