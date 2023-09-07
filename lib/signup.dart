@@ -108,9 +108,9 @@ class SignupPage extends StatelessWidget{
                   else if(email.text.length<7){
                     displayToastMessage("Password needs to be at least 7 characters", context);
                   }
-                  else {
+                  /*else {
                     registerNewUser(context);
-                  }
+                  }*/
                 }, child: const Text("Create Account"),
                 style: ElevatedButton.styleFrom(backgroundColor: hexToColor("#1E847F"),
                 fixedSize: const Size(130, 40),
@@ -125,9 +125,9 @@ class SignupPage extends StatelessWidget{
   }
 }
 
- final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+ //final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
- void registerNewUser(BuildContext context) async{
+ /*void registerNewUser(BuildContext context) async{
    
    final User? firebaseUser = (await _firebaseAuth
        .createUserWithEmailAndPassword(email: email.text,
@@ -155,7 +155,7 @@ class SignupPage extends StatelessWidget{
        displayToastMessage("New user account has not been created", context);
      }
 
- }
+ }*/
 
  displayToastMessage(String message, BuildContext context){
    Fluttertoast.showToast(msg: message);

@@ -5,22 +5,19 @@ import 'signup.dart';
 import 'home.dart';
 //import 'homewithmap.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const MyApp());
+void main() async{
+  //WidgetsFlutterBinding.ensureInitialized();
+  //await Firebase.initializeApp();
+  //runApp(const MyApp());
 }
 
-DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
+//DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
 
 TextEditingController nameController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +41,7 @@ class MyLoginPage extends StatefulWidget {
   _MyLoginPageState createState() => _MyLoginPageState();
 }
 
-class _MyLoginPageState extends State<MyHomePage> {
+class _MyLoginPageState extends State<MyLoginPage> {
 
   bool rememberMe = false;
 
