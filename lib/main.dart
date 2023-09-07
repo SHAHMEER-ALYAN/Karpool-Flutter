@@ -8,7 +8,7 @@ import 'home.dart';
 void main() async{
   //WidgetsFlutterBinding.ensureInitialized();
   //await Firebase.initializeApp();
-  //runApp(const MyApp());
+  runApp(const MyApp());
 }
 
 //DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
