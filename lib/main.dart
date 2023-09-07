@@ -1,34 +1,50 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'signup.dart';
 import 'home.dart';
-import 'homewithmap.dart';
+//import 'homewithmap.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
 }
+
+DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
 
 TextEditingController nameController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
 
 
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyHomePage(),
+      initialRoute: MyLoginPage.idScreen,
+      routes:
+      {
+        SignupPage.idScreen: (context) => SignupPage(),
+        MyLoginPage.idScreen: (context) => MyLoginPage(),
+        MyHomePage.idScreen: (context) => MyHomePage(),
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyLoginPage extends StatefulWidget {
+  static const String idScreen = "login";
+
+  const MyLoginPage({super.key});
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyLoginPageState createState() => _MyLoginPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyLoginPageState extends State<MyHomePage> {
 
   bool rememberMe = false;
 
@@ -45,26 +61,26 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               const SizedBox(height: 80),
               Image.asset('assets/logo.png', width: 200, height: 200),
-              Text("KARPOOL",style: TextStyle(color: Colors.white,
+              const Text("KARPOOL",style: TextStyle(color: Colors.white,
               fontSize: 32,
               fontWeight: FontWeight.bold),),
               loginBox(),
-              SizedBox(height:20),
+              const SizedBox(height:20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: hexToColor("#1E847F"),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)
                   ),
-                  fixedSize: Size(180, 40)
+                  fixedSize: const Size(180, 40)
                 ),
                   onPressed: () {
-
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Signup()));
+                  Navigator.pushNamedAndRemoveUntil(context, SignupPage.idScreen, (route) => false);
+                 // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Signup()));
                   // MaterialPageRoute(builder: (context) => Signup())
 
                   },
-                  child:Text("SIGN UP"))
+                  child:const Text("SIGN UP"))
             ],
           ),
         ),
@@ -85,9 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Align(
+          const Align(
             alignment: Alignment.centerLeft,
-            child: const Text("Phone Number",style:
+            child: Text("Phone Number",style:
             TextStyle(color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 18
@@ -101,9 +117,9 @@ class _MyHomePageState extends State<MyHomePage> {
           )
           ),
           const SizedBox(height: 20,),
-          Align(
+          const Align(
             alignment: Alignment.centerLeft,
-            child: const Text("Password",style: TextStyle(color: Colors.white,
+            child: Text("Password",style: TextStyle(color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 18,),
             ),
@@ -116,36 +132,36 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Align(alignment: Alignment.center,
               child: TextButton(onPressed: () {},
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.only(top: 15),),
                   child: Text("Forget Password?",
                     style: TextStyle(color: hexToColor("#1E847F"),
-                        fontWeight: FontWeight.bold),),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.only(top: 15),)
+                        fontWeight: FontWeight.bold),)
               )
           ),
           checkboxWidget(),
           ElevatedButton(onPressed: () {
 
             if(nameController.text=="123456" && passwordController.text == "123456"){
-            Navigator.push(
-              context,MaterialPageRoute(builder: (context) => home()),
-          );
+
+              Navigator.pushNamedAndRemoveUntil(context, MyHomePage.idScreen, (route) => false);
+              //Navigator.push(context,MaterialPageRoute(builder: (context) => home()),);
             }else{
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("INVALID CREDENTIALS"),
+                const SnackBar(content: Text("INVALID CREDENTIALS"),
                   duration:Duration(seconds: 2),)
               );
             }
 
           },
-          child: const Text("LOGIN"),
             style: ElevatedButton.styleFrom(
               backgroundColor: hexToColor("#1E847F"),
-                fixedSize: Size(130, 40),
+                fixedSize: const Size(130, 40),
               shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15)
               )
             ),
+          child: const Text("LOGIN"),
           ),
         ],
       ),

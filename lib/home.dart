@@ -4,9 +4,9 @@ import "package:google_maps_flutter/google_maps_flutter.dart";
 import "main.dart";
 import "package:toggle_switch/toggle_switch.dart";
 
-void main() {
+/*void main() {
   runApp(home());
-}
+}*/
 var startLocationCo;
 TextEditingController startlocation = TextEditingController();
 TextEditingController endlocation = TextEditingController();
@@ -16,20 +16,22 @@ double startLong = 67.1962;
 // double? startLong;
 String? startName;
 bool show=false;
-LatLng locationTesting1 = LatLng(24.8674, 67.1962);
+LatLng locationTesting1 = const LatLng(24.8674, 67.1962);
 
 
-class home extends StatelessWidget {
+/*class home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: MyHomePage(),
     );
   }
-}
+}*/
 
 class MyHomePage extends StatefulWidget {
+  static const idScreen = "mainScreen";
 
+  const MyHomePage({super.key});
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -62,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _currentIndex = index;
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.person),
               label: 'Profile'
@@ -88,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
     width: MediaQuery.of(context).size.width,
     child: GoogleMap(
       myLocationEnabled: true,
-      initialCameraPosition: CameraPosition(
+      initialCameraPosition: const CameraPosition(
         target: LatLng(24.8674,67.1962),
         zoom: 15,
       ),
@@ -124,14 +126,14 @@ Container locationBox(context){
         Container(
           child: Row(
           children: [
-            Padding(padding: EdgeInsets.all(10),
+            const Padding(padding: EdgeInsets.all(10),
             child: Icon(Icons.location_pin,color: Colors.red,)
               ,),
             Expanded(
                 child: TextField(
                   autofocus: false,
                 controller: startlocation,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                 hintText: "Start Location",
                 hintStyle: TextStyle(
                     color: Colors.grey
@@ -154,16 +156,16 @@ Container locationBox(context){
           ],
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Container(
           child: Row(
             children: [
-              Padding(padding: EdgeInsets.all(10),
+              const Padding(padding: EdgeInsets.all(10),
                 child: Icon(Icons.location_pin,color: Colors.green,)
                 ,),
               Expanded(child: TextField(
                 controller: endlocation,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                     hintText: "End Location",
                     hintStyle: TextStyle(
                         color: Colors.grey
@@ -174,18 +176,18 @@ Container locationBox(context){
             ],
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         ElevatedButton(onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: hexToColor("#1E847F"),
-              fixedSize: Size(130,40),
+              fixedSize: const Size(130,40),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15)
               )
             ),
             child:
-              Text("Proceed")),
-        SizedBox(height: 10),
+              const Text("Proceed")),
+        const SizedBox(height: 10),
       ],
     ),
   );
@@ -202,14 +204,14 @@ Widget modeSelector(){
         height: 70,
         decoration: BoxDecoration(
           color: hexToColor("#777777"),
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20))
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             ToggleSwitch(
               minWidth: 90.0,
               initialLabelIndex: 1,
@@ -219,7 +221,7 @@ Widget modeSelector(){
               inactiveBgColor: Colors.grey,
               inactiveFgColor: Colors.white,
               totalSwitches: 2,
-              labels: ['Find Pool','Offer Pool'],
+              labels: const ['Find Pool','Offer Pool'],
               onToggle: (index){
                 print("switched to: $index");
               },
@@ -264,7 +266,7 @@ class LocationTextField extends StatelessWidget {
             child: TextField(
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: TextStyle(
+                hintStyle: const TextStyle(
                   color: Colors.grey,
                 ),
                 border: InputBorder.none,
@@ -297,8 +299,8 @@ class _CheckboxWidgetState extends State<CheckboxWidget> {
           },
             activeColor: hexToColor("#1e847f"),
         ),
-        SizedBox(height: 10),
-        Text('Advance Search',style: TextStyle(fontWeight: FontWeight.bold,
+        const SizedBox(height: 10),
+        const Text('Advance Search',style: TextStyle(fontWeight: FontWeight.bold,
         fontSize: 16),),
       ],
     );

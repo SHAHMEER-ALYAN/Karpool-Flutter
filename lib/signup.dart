@@ -1,20 +1,22 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'main.dart';
 import 'package:http/http.dart' as http;
 
 
-void main(){
+/*void main(){
   runApp(const Signup());
-}
+}*/
 
 TextEditingController name = TextEditingController();
 TextEditingController phone = TextEditingController();
 TextEditingController email = TextEditingController();
 TextEditingController password = TextEditingController();
 
-class Signup extends StatelessWidget{
+/*class Signup extends StatelessWidget{
   const Signup({super.key});
 
 
@@ -26,11 +28,12 @@ class Signup extends StatelessWidget{
      home: SignupPage(),
    );
   }
-}
+}*/
 
 class SignupPage extends StatelessWidget{
-  const SignupPage({super.key});
+  //const SignupPage({super.key});
 
+  static const String idScreen = "signup";
 
   Future<void> insertrecord() async
   {
@@ -91,7 +94,23 @@ class SignupPage extends StatelessWidget{
                 signupInfo(),
                 const SizedBox(height: 20,),
                 ElevatedButton(onPressed: () {
-                  insertrecord();
+                  //insertrecord()
+                  if(name.text.length <= 3)
+                    {
+                      displayToastMessage("Name must be at least 3 characters.", context);
+                    }
+                  else if(email.text.contains("@")){
+                    displayToastMessage("Email address is not valid", context);
+                  }
+                  else if(phone.text.isEmpty){
+                    displayToastMessage("Phone number is required", context);
+                  }
+                  else if(email.text.length<7){
+                    displayToastMessage("Password needs to be at least 7 characters", context);
+                  }
+                  else {
+                    registerNewUser(context);
+                  }
                 }, child: const Text("Create Account"),
                 style: ElevatedButton.styleFrom(backgroundColor: hexToColor("#1E847F"),
                 fixedSize: const Size(130, 40),
@@ -105,6 +124,42 @@ class SignupPage extends StatelessWidget{
     );
   }
 }
+
+ final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+ void registerNewUser(BuildContext context) async{
+   
+   final User? firebaseUser = (await _firebaseAuth
+       .createUserWithEmailAndPassword(email: email.text,
+       password: password.text).catchError((errMsg){
+         displayToastMessage("Error: "+errMsg.toString(), context);
+   })).user;
+
+   if(firebaseUser != null  )
+     {
+
+       Map userDataMap = {
+         "name" : name.text.trim(),
+         "email" : email.text.trim(),
+         "phone" : phone.text.trim(),
+       };
+
+       usersRef.child(firebaseUser.uid).set(userDataMap);
+       displayToastMessage("Your account has been created successfully", context);
+
+       Navigator.pushNamedAndRemoveUntil(context, MyLoginPage.idScreen, (route) => false);
+
+     }
+   else
+     {
+       displayToastMessage("New user account has not been created", context);
+     }
+
+ }
+
+ displayToastMessage(String message, BuildContext context){
+   Fluttertoast.showToast(msg: message);
+ }
 
 Widget signupInfo(){
   return Container(
