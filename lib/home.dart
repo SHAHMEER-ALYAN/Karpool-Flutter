@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
       markers: {
         Marker(
             markerId: const MarkerId("marker1"),
-            position: LatLng(24.8674,67.1962!),
+            position: LatLng(24.8674,67.1962),
             draggable: true,
             onDragEnd: (value){
               locationTesting1 = value;
