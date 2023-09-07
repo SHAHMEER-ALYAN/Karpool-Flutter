@@ -39,7 +39,7 @@ class _LocationScreenState extends State<LocationScreen> {
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: GooglePlaceAutoCompleteTextField(
         textEditingController: controller,
-        googleAPIKey: "AIzaSyD9aYD2LXsWn_Zx8rCSQ_DUPAjfoavM4lE", // Replace with your API key
+        googleAPIKey: "PASTE_API_HERE", // Replace with your API key
         textStyle: TextStyle(color: Colors.white),
         inputDecoration: InputDecoration(
           hintText: "Search your location",
