@@ -35,7 +35,7 @@ class SignupPage extends StatelessWidget{
 
   static const String idScreen = "signup";
 
-  Future<void> insertrecord() async
+  /*Future<void> insertrecord() async
   {
     if(name.text!=""||email.text!=""||password.text!=""||phone.text!=""){
       try{
@@ -71,7 +71,7 @@ class SignupPage extends StatelessWidget{
       }else{
       print("please fill alll fields");
       }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -100,13 +100,13 @@ class SignupPage extends StatelessWidget{
                     {
                       displayToastMessage("Name must be at least 3 characters.", context);
                     }
-                  else if(email.text.contains("@")){
+                  else if(!email.text.contains("@")){
                     displayToastMessage("Email address is not valid", context);
                   }
                   else if(phone.text.isEmpty){
                     displayToastMessage("Phone number is required", context);
                   }
-                  else if(email.text.length<7){
+                  else if(password.text.length<7){
                     displayToastMessage("Password needs to be at least 7 characters", context);
                   }
                   else {
@@ -128,35 +128,35 @@ class SignupPage extends StatelessWidget{
 
  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
- void registerNewUser(BuildContext context) async{
-   
-   final User? firebaseUser = (await _firebaseAuth
-       .createUserWithEmailAndPassword(email: email.text,
-       password: password.text).catchError((errMsg){
-         displayToastMessage("Error: "+errMsg.toString(), context);
-   })).user;
+void registerNewUser(BuildContext context) async{
 
-   if(firebaseUser != null  )
-     {
+  final User? firebaseUser = (await _firebaseAuth
+      .createUserWithEmailAndPassword(email: email.text,
+      password: password.text).catchError((errMsg){
+    displayToastMessage("Error: "+errMsg.toString(), context);
+  })).user;
 
-       Map userDataMap = {
-         "name" : name.text.trim(),
-         "email" : email.text.trim(),
-         "phone" : phone.text.trim(),
-       };
+  if(firebaseUser != null  )
+  {
 
-       usersRef.child(firebaseUser.uid).set(userDataMap);
-       displayToastMessage("Your account has been created successfully", context);
+    Map userDataMap = {
+      "name" : name.text.trim(),
+      "email" : email.text.trim(),
+      "phone" : phone.text.trim(),
+    };
 
-       Navigator.pushNamedAndRemoveUntil(context, MyLoginPage.idScreen, (route) => false);
+    usersRef.child(firebaseUser.uid).set(userDataMap);
+    displayToastMessage("Your account has been created successfully", context);
 
-     }
-   else
-     {
-       displayToastMessage("New user account has not been created", context);
-     }
+    Navigator.pushNamedAndRemoveUntil(context, MyLoginPage.idScreen, (route) => false);
 
- }
+  }
+  else
+  {
+    displayToastMessage("New user account has not been created", context);
+  }
+
+}
 
  displayToastMessage(String message, BuildContext context){
    Fluttertoast.showToast(msg: message);

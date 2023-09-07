@@ -49,7 +49,7 @@ class home extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-
+  static const String idScreen = "MainScreen";
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }

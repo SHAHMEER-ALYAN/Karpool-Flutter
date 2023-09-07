@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'signup.dart';
 import 'home.dart';
@@ -8,9 +10,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   final prefs = await SharedPreferences.getInstance();
   runApp(MyApp());
 }
+
+DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
 
 TextEditingController nameController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
@@ -19,17 +24,26 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyHomePage(),
+        initialRoute: MyLoginPage.idScreen,
+        routes:
+        {
+          SignupPage.idScreen: (context) => SignupPage(),
+          MyLoginPage.idScreen: (context) => MyLoginPage(),
+          MyHomePage.idScreen: (context) => MyHomePage(),
+        },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyLoginPage extends StatefulWidget {
+  static const String idScreen = "login";
+
+  const MyLoginPage({super.key});
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyLoginPageState createState() => _MyLoginPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyLoginPageState extends State<MyLoginPage> {
   bool rememberMe = false;
 
   @override
@@ -65,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Signup()));
+                      MaterialPageRoute(builder: (context) => SignupPage()));
                 },
                 child: Text("SIGN UP"),
               ),
