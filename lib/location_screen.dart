@@ -10,8 +10,8 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   TextEditingController controller = TextEditingController();
-  double? selectedLatitude;
-  double? selectedLongitude;
+  String? selectedLatitude;
+  String? selectedLongitude;
   String? selectedLocation;
 
 
@@ -19,14 +19,13 @@ class _LocationScreenState extends State<LocationScreen> {
   Widget build(BuildContext context) {
     double hh = MediaQuery.of(context).size.height/5;
 
-
     return Scaffold(
       backgroundColor: hexToColor("#121212"),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            
+
             SizedBox(height: hh),
             placesAutoCompleteTextField(),
           ],
@@ -53,17 +52,20 @@ class _LocationScreenState extends State<LocationScreen> {
         isLatLngRequired: true, // Set this to true to get lat/lng
         getPlaceDetailWithLatLng: (Prediction prediction) {
           print("Latitude: ${prediction.lat}, Longitude: ${prediction.lng}");
+          // selectedLatitude = prediction.lat;
+          // selectedLongitude = prediction.lng;
+          if(prediction.description!=null){
+            Navigator.pop(context,[prediction.lat,prediction.lng,selectedLocation]);
+          }
         },
         itemClick: (Prediction prediction) {
           controller.text = prediction.description ?? "";
           controller.selection = TextSelection.fromPosition(
               TextPosition(offset: prediction.description?.length ?? 0));
-          selectedLatitude = prediction.lat as double?;
-          selectedLongitude = prediction.lng as double?;
+
           selectedLocation = prediction.description;
-          if(selectedLocation!=null){
-          Navigator.pop(context,[selectedLatitude,selectedLongitude,selectedLocation]);
-          }
+
+
         },
         seperatedBuilder: Divider(
           height: 5,

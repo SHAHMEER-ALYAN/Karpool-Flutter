@@ -1,21 +1,40 @@
+import 'dart:core';
+
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'location_screen.dart';
 import 'package:flutter/material.dart';
 import "package:google_maps_flutter/google_maps_flutter.dart";
 import "main.dart";
 import "package:toggle_switch/toggle_switch.dart";
+import 'last_screen.dart';
 
 void main() {
   runApp(home());
 }
 var startLocationCo;
+var endLocationCo;
 TextEditingController startlocation = TextEditingController();
 TextEditingController endlocation = TextEditingController();
-double startLat = 24.8674;
-double startLong = 67.1962;
-// double? startLat;
-// double? startLong;
+
+// double startLat = 24.8674;
+// double startLong = 67.1962;
+double? startLat; // Set your default latitude value here
+double? startLong;
 String? startName;
-bool show=false;
+double? endLat;
+double? endLong;
+String? endName;
+bool passenger=true;
+
+Future<String?> getUserIdFromStorage() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('userId');
+}
+
+String IDID = getUserIdFromStorage() as String;
+
 LatLng locationTesting1 = LatLng(24.8674, 67.1962);
 
 
@@ -24,6 +43,7 @@ class home extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: MyHomePage(),
+
     );
   }
 }
@@ -35,17 +55,40 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Set<Polyline> polylines = {};
   bool showSecondBox = false;
   int _currentIndex = 0;
+  locationStarter() async {
+
+      if(startLat==null || startLong==null){
+        Position current = await Geolocator.getCurrentPosition();
+        startLat = current.latitude;
+        startLong = current.longitude;
+        // return LatLng(startLat!, startLong!);
+      }
+  }
+
+  // @override
+  // void initState(){
+  //   var marker1;
+  //   markers = [
+  //     Marker(markerId: marker1,
+  //     position: )
+  //   ];
+  // }
+
+
 
 
   @override
   Widget build(BuildContext context) {
     final location = ModalRoute.of(context)!.settings.arguments;
+    locationStarter();
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Map(context),
             modeSelector(),
@@ -81,35 +124,56 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+// _addPolyLine() {
+//       PolylineId id = PolylineId("poly");
+//       Polyline polyline = Polyline(
+//       polylineId: id, color: hexToColor("#1E847F"), points: [locationTesting1]);
+//       polylines[id] = polyline;
+// }
 
-  Container Map(context){
-  return Container(
-    height: MediaQuery.of(context).size.height/1.8,
-    width: MediaQuery.of(context).size.width,
-    child: GoogleMap(
-      myLocationEnabled: true,
-      initialCameraPosition: CameraPosition(
-        target: LatLng(24.8674,67.1962),
-        zoom: 15,
-      ),
 
-      markers: {
-        Marker(
-            markerId: const MarkerId("marker1"),
-            position: LatLng(24.8674,67.1962!),
-            draggable: true,
-            onDragEnd: (value){
-              locationTesting1 = value;
-            },
+  Widget Map(context){
+
+  return Expanded(
+    child: Container(
+      height: MediaQuery.of(context).size.height/2,
+      width: MediaQuery.of(context).size.width,
+      child: GoogleMap(
+        myLocationEnabled: true,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(24.8674,67.1962),
+          zoom: 15,
         ),
-        const Marker(
-          markerId: MarkerId("marker2"),
-          position: LatLng(24.8674,67.1962),
-        )
-      },
+        // *****
+
+      //   polylines: {
+      //     Polyline(
+      //       polylineId: PolylineId("poly"),
+      //         points: [LatLng(startLat!,startLong!),LatLng(24.867646307371512, 67.19455220974876)],
+      //         color: hexToColor("#1E847F"),
+      //
+      //     )
+      // },
+        // ********
+        // markers: {
+        //   Marker(
+        //     markerId: MarkerId("marker1"),
+        //     position: LatLng(24.8674, 67.2),
+        //     draggable: false,
+        //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        //       ),
+        //   Marker(
+        //     markerId: MarkerId("marker2"),
+        //     position: LatLng(24.8674,67.1962),
+        //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        //   )
+        // },
+      ),
     ),
   );
   }
+
+
 
 Container locationBox(context){
   return Container(
@@ -129,9 +193,15 @@ Container locationBox(context){
               ,),
             Expanded(
                 child: TextField(
-                  autofocus: false,
+                  showCursor: true,
+                  readOnly: true,
+                  // autofocus: false,
                 controller: startlocation,
+                style: TextStyle(
+                  color: Colors.white
+                ),
                 decoration: InputDecoration(
+                  // enabled: false,
                 hintText: "Start Location",
                 hintStyle: TextStyle(
                     color: Colors.grey
@@ -141,19 +211,22 @@ Container locationBox(context){
                   startLocationCo = await Navigator.push(context,
                       MaterialPageRoute(
                           builder: (context)=>LocationScreen()));
-                          if(startLocationCo != null && startLocationCo.length == 3){
-                            startLat = startLocationCo[0];
-                            startLong = startLocationCo[1];
-                            startName = startLocationCo[2];
-                            startlocation.text= startName!;
+                          print("*** startlocation = ${startLocationCo} ***");
+                          startLat = double.parse(startLocationCo[0]);
+                          startLong = double.parse(startLocationCo[1]);
+                          startName = startLocationCo[2];
+                          if(startName != null){
 
+                            print("!!!!!!!!!! ${startName} ==== ${startLat} ======}");
+                            startlocation.text= startName!;
+                            print(IDID);
                           }
-                  },
-              )
-            )
-          ],
-          ),
-        ),
+                        },
+                      )
+                    )
+                  ],
+                ),
+            ),
         SizedBox(height: 10),
         Container(
           child: Row(
@@ -162,20 +235,41 @@ Container locationBox(context){
                 child: Icon(Icons.location_pin,color: Colors.green,)
                 ,),
               Expanded(child: TextField(
+                showCursor: true,
+                readOnly: true,
                 controller: endlocation,
+                style: TextStyle(
+                  color: Colors.white
+                ),
                 decoration: InputDecoration(
                     hintText: "End Location",
                     hintStyle: TextStyle(
                         color: Colors.grey
                     )
                 ),
+                onTap: () async {
+                  endLocationCo = await Navigator.push(context,
+                      MaterialPageRoute(
+                          builder: (context)=>LocationScreen()));
+                  print("*** endlocation = ${endLocationCo} ***");
+                  endLat = double.parse(endLocationCo[0]);
+                  endLong = double.parse(endLocationCo[1]);
+                  endName = endLocationCo[2];
+                  if(endName != null){
+
+                    print("!!!!!!!!!! ${endName} ==== ${endLat} ==tartLong}");
+                    endlocation.text= endName!;
+                  }
+                },
               )
               )
             ],
           ),
         ),
         SizedBox(height: 10),
-        ElevatedButton(onPressed: () {},
+        ElevatedButton(onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> lastScreen()));
+        },
             style: ElevatedButton.styleFrom(
               backgroundColor: hexToColor("#1E847F"),
               fixedSize: Size(130,40),
@@ -221,7 +315,12 @@ Widget modeSelector(){
               totalSwitches: 2,
               labels: ['Find Pool','Offer Pool'],
               onToggle: (index){
-                print("switched to: $index");
+                if(index==0){
+                  passenger=true;
+                }else{
+                  passenger=false;
+                }
+                print("switched to: $index and passenger value is $passenger");
               },
             ),
             CheckboxWidget()
@@ -232,14 +331,6 @@ Widget modeSelector(){
   );
 }
 
-// bool check(){
-//
-//   if(startlocation.text!=null && endlocation.text!=null){
-//     show=true;
-//   return show;
-//   }else
-//     return show;
-// }
 
 class LocationTextField extends StatelessWidget {
   final IconData icon;

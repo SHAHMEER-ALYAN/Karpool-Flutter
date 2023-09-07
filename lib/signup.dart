@@ -73,6 +73,7 @@ class SignupPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: hexToColor("#121212"),
       body: Container(
                 child: Center(
@@ -124,6 +125,7 @@ Widget signupInfo(){
       ),
       TextField(
         controller: name,
+          style: TextStyle(color: Colors.white),
           decoration: textfieldstyle("Enter Full Name"),
       ),
       const SizedBox(height: 20,),
@@ -135,6 +137,7 @@ Widget signupInfo(){
       ),
       TextField(
         controller: phone,
+        style: TextStyle(color: Colors.white),
         decoration: textfieldstyle("Enter Phone Number"),),
       const SizedBox(height: 20,),
       Align(
@@ -142,6 +145,7 @@ Widget signupInfo(){
           child: Text("Email",style: textstyle(),)
       ),
       TextField(
+          style: TextStyle(color: Colors.white),
           controller: email,
           decoration: textfieldstyle("Enter Email")
       ),
@@ -152,13 +156,16 @@ Widget signupInfo(){
       ),
       TextField(
           controller: password,
+          style: TextStyle(color: Colors.white),
           decoration: textfieldstyle("Enter Password")),
       const SizedBox(height: 20,),
       Align(
           alignment: Alignment.centerLeft,
           child: Text("Confirm Password",style: textstyle(),)
       ),
-      TextField(decoration: textfieldstyle("Confirm Password"),
+      TextField(
+        style: TextStyle(color: Colors.white),
+        decoration: textfieldstyle("Confirm Password"),
       )
     ],
   ),

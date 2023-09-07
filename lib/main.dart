@@ -1,10 +1,14 @@
+import 'dart:convert';
+import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'signup.dart';
 import 'home.dart';
-import 'homewithmap.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
   runApp(MyApp());
 }
 
@@ -12,9 +16,6 @@ TextEditingController nameController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 
 class MyApp extends StatelessWidget {
-
-
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,13 +30,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   bool rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       backgroundColor: hexToColor("#121212"),
       body: Container(
         color: hexToColor('#121212'),
@@ -45,34 +45,36 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               const SizedBox(height: 80),
               Image.asset('assets/logo.png', width: 200, height: 200),
-              Text("KARPOOL",style: TextStyle(color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold),),
+              Text(
+                "KARPOOL",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               loginBox(),
-              SizedBox(height:20),
+              SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: hexToColor("#1E847F"),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  fixedSize: Size(180, 40)
+                  fixedSize: Size(180, 40),
                 ),
-                  onPressed: () {
-
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Signup()));
-                  // MaterialPageRoute(builder: (context) => Signup())
-
-                  },
-                  child:Text("SIGN UP"))
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Signup()));
+                },
+                child: Text("SIGN UP"),
+              ),
             ],
           ),
         ),
       ),
     );
   }
-
-
 
   Widget loginBox() {
     return Container(
@@ -87,64 +89,75 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: const Text("Phone Number",style:
-            TextStyle(color: Colors.white,
+            child: const Text(
+              "Phone Number",
+              style: TextStyle(
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 18
-            ),
+                fontSize: 18,
+              ),
             ),
           ),
           TextField(
-              controller: nameController ,decoration: InputDecoration(hintText: "Enter Phone Number",
+            controller: nameController,
+            style: TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: "Enter Phone Number",
               hintStyle: TextStyle(color: hexToColor("#777777")),
-              border: const UnderlineInputBorder( borderSide: BorderSide(color: Colors.black))
-          )
-          ),
-          const SizedBox(height: 20,),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: const Text("Password",style: TextStyle(color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,),
+              border: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black)),
             ),
           ),
-          TextField(controller: passwordController,
-              decoration: InputDecoration(hintText: "Enter Password",
+          const SizedBox(height: 20),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: const Text(
+              "Password",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ),
+          TextField(
+            controller: passwordController,
+            style: TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: "Enter Password",
               hintStyle: TextStyle(color: hexToColor('#777777')),
-              border: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.black,))
+              border: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black)),
+            ),
           ),
-          ),
-          Align(alignment: Alignment.center,
-              child: TextButton(onPressed: () {},
-                  child: Text("Forget Password?",
-                    style: TextStyle(color: hexToColor("#1E847F"),
-                        fontWeight: FontWeight.bold),),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.only(top: 15),)
-              )
+          Align(
+            alignment: Alignment.center,
+            child: TextButton(
+              onPressed: () {},
+              child: Text(
+                "Forget Password?",
+                style: TextStyle(
+                    color: hexToColor("#1E847F"), fontWeight: FontWeight.bold),
+              ),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.only(top: 15),
+              ),
+            ),
           ),
           checkboxWidget(),
-          ElevatedButton(onPressed: () {
-
-            if(nameController.text=="123456" && passwordController.text == "123456"){
-            Navigator.push(
-              context,MaterialPageRoute(builder: (context) => home()),
-          );
-            }else{
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("INVALID CREDENTIALS"),
-                  duration:Duration(seconds: 2),)
-              );
-            }
-
-          },
-          child: const Text("LOGIN"),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>home()));
+              // Call the loginUser function here
+              loginUser();
+            },
+            child: const Text("LOGIN"),
             style: ElevatedButton.styleFrom(
               backgroundColor: hexToColor("#1E847F"),
-                fixedSize: Size(130, 40),
+              fixedSize: Size(130, 40),
               shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15)
-              )
+                borderRadius: BorderRadius.circular(15),
+              ),
             ),
           ),
         ],
@@ -166,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             activeColor: hexToColor("#1e847f"),
           ),
-          const SizedBox(width: 6), // Adjust the width as needed
+          const SizedBox(width: 6),
           const Text(
             "Remember Me",
             style: TextStyle(
@@ -180,9 +193,94 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-}
+  // Move the loginUser function outside of the build method
+  void loginUser() async {
+    dynamic responseJson;
+    String userId = '';
+    String errorMessage = '';
 
-Color hexToColor(String hexColor) {
-  return Color(int.parse(hexColor.substring(1, 7), radix: 16) + 0xFF000000);
+    final String url = 'http://10.0.2.2/practice_api/check.php'; // Replace with your PHP script's URL
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'name': nameController.text,
+        'password': passwordController.text,
+      },
+    );
+    print("--------------------");
+
+    if (response.statusCode == 200) {
+      try {
+        // Extract the JSON string from the response
+        final jsonString = response.body.substring(response.body.indexOf('{'));
+        responseJson = jsonDecode(jsonString);
+        if (responseJson != null && responseJson['success']) {
+          // Successful response
+          setState(() {
+            userId = 'User ID: ${responseJson['userId']}';
+
+          });
+          print("################ $userId");
+          // Navigate to the home screen
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => home()),
+          // );
+          print("After navigation====");
+        } else {
+          setState(() {
+            userId = '';
+            errorMessage = 'Invalid credentials';
+          });
+        }
+      } catch (e) {
+    print("JSON decoding error: $e");
+    // Handle JSON decoding error...
+    }
+
+      if (responseJson['success']) {
+        print("***************");
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setString('userId', userId);
+          print(" ******************* ");
+        } catch (e) {
+          print('Error: $e');
+        }
+
+        // final prefs = await SharedPreferences.getInstance();
+        // prefs.setString('userId', userId);
+        // print("before nav");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => home()),
+        );
+        setState(() async {
+          userId = 'User ID: ${responseJson['userId']}';
+        });
+        // final prefs = await SharedPreferences.getInstance();
+        // prefs.setString('userId', userId);
+
+        // Navigate to the home screen
+
+        print("After navigation");
+      } else {
+        setState(() {
+          userId = '';
+          errorMessage = 'Invalid credentials';
+        });
+      }
+    } else {
+      setState(() {
+        userId = '';
+        errorMessage = 'Error connecting to the server';
+      });
+    }
+  }
+
 }
+  Color hexToColor(String hexColor) {
+    return Color(int.parse(hexColor.substring(1, 7), radix: 16) + 0xFF000000);
+  }
 
