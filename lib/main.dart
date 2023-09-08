@@ -17,9 +17,12 @@ Future<void> main() async {
 }
 
 DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
+final FirebaseAuth _auth = FirebaseAuth.instance;
+String _userId = '';
 
-TextEditingController emailController = TextEditingController();
+TextEditingController emailMainController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -114,7 +117,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
             ),
           ),
           TextField(
-            controller: emailController,
+            controller: emailMainController,
             style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
               hintText: "Enter Your Email",
@@ -218,35 +221,68 @@ class _MyLoginPageState extends State<MyLoginPage> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
     void loginUser(BuildContext context) async{
 
-      final User? firebaseUser = (await _firebaseAuth
-          .signInWithEmailAndPassword(
-          email: email.text,
-          password: password.text
-      ).catchError((errMsg){
-        displayToastMessage("Error: "+errMsg.toString(), context);
-      })).user;
+      try {
+        final userCredential = await _auth.signInWithEmailAndPassword(
+          email: emailMainController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
-      if(firebaseUser != null  )
-      {
-
-        usersRef.child(firebaseUser.uid).once()
-            .then((value) => (DataSnapshot snap){
-          if(snap.value != null){
+        final user = userCredential.user;
+        if (user != null) {
+          setState(() {
+            // print("%%%%%%%%%%% ${user.uid}");
+            _userId = 'User ID: ${user.uid}';
             Navigator.pushNamedAndRemoveUntil(context, MyHomePage.idScreen, (route) => false);
-            displayToastMessage("you are logged in successfully", context);
-          }
 
-          else{
-            _firebaseAuth.signOut();
-            displayToastMessage("User does not exist. Please create new account.", context);
-          }
+          });
+        } else {
+          setState(() {
+            _userId = 'User not found';
+          });
+        }
+      } catch (e) {
+        setState(() {
+          _userId = 'Error: $e';
         });
+      }
 
-      }
-      else
-      {
-        displayToastMessage("Error Occurred, can not be signed in", context);
-      }
+      // print('%%%%%%%%%%% ${emailMainController.text}  %%%% ${passwordController.text} %%%%');
+      //
+      // final User? firebaseUser = (await _firebaseAuth
+      //     .signInWithEmailAndPassword(
+      //
+      //     email: emailMainController.text.trim(),
+      //     password: passwordController.text.trim()
+      // ).catchError((errMsg){
+      //   displayToastMessage("Error: "+errMsg.toString(), context);
+      // })).user;
+      //
+      // if(firebaseUser!.uid != null  )
+      // {
+      //
+      //   usersRef.child(firebaseUser.uid).once()
+      //       .then((value) => (DataSnapshot snap){
+      //         print("========= ${usersRef} ============");
+      //     if(snap.value != null){
+      //       Navigator.pushNamedAndRemoveUntil(context, MyHomePage.idScreen, (route) => false);
+      //       displayToastMessage("you are logged in successfully", context);
+      //     }
+      //
+      //     else{
+      //       _firebaseAuth.signOut();
+      //       ScaffoldMessenger.of(context).showSnackBar(
+      //         const SnackBar(content: Text("USER DOES NOT EXIST"),
+      //           duration: Duration(seconds: 5),)
+      //       );
+      //       displayToastMessage("User does not exist. Please create new account.", context);
+      //     }
+      //   });
+      //
+      // }
+      // else
+      // {
+      //   displayToastMessage("Error Occurred, can not be signed in", context);
+      // }
 
     }
   /*void loginUser() async {

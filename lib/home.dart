@@ -27,6 +27,36 @@ double? endLat;
 double? endLong;
 String? endName;
 bool passenger=true;
+bool marker1Visibility= false;
+
+
+
+Marker m1 = Marker(
+markerId: MarkerId("marker1"),
+position: LatLng(24.8674, 67.32),
+draggable: false,
+visible: true,
+icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+);
+
+Marker m2 = Marker(
+  markerId: MarkerId("marker2"),
+  position: LatLng(24.8674, 67.2),
+  draggable: false,
+  visible: false,
+  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+);
+
+Polyline p1 = Polyline(
+polylineId: PolylineId("poly"),
+points: [LatLng(24.8674,67.32),LatLng(24.8674, 67.22)],
+visible: false,
+// patterns: [PatternItem.dot],
+geodesic: true,
+width: 4,
+color: hexToColor("#1E847F"),);
+
+
 
 Future<String?> getUserIdFromStorage() async {
   final prefs = await SharedPreferences.getInstance();
@@ -55,17 +85,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+
   Set<Polyline> polylines = {};
   bool showSecondBox = false;
   int _currentIndex = 0;
-  locationStarter() async {
 
-      if(startLat==null || startLong==null){
-        Position current = await Geolocator.getCurrentPosition();
-        startLat = current.latitude;
-        startLong = current.longitude;
-        // return LatLng(startLat!, startLong!);
-      }
+  locationStarter() async {
+    if (startLat == null || startLong == null) {
+      Position current = await Geolocator.getCurrentPosition();
+      startLat = current.latitude;
+      startLong = current.longitude;
+      // return LatLng(startLat!, startLong!);
+    }
   }
 
   // @override
@@ -78,11 +110,12 @@ class _MyHomePageState extends State<MyHomePage> {
   // }
 
 
-
-
   @override
   Widget build(BuildContext context) {
-    final location = ModalRoute.of(context)!.settings.arguments;
+    final location = ModalRoute
+        .of(context)!
+        .settings
+        .arguments;
     locationStarter();
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -122,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-}
+
 
 // _addPolyLine() {
 //       PolylineId id = PolylineId("poly");
@@ -131,159 +164,204 @@ class _MyHomePageState extends State<MyHomePage> {
 //       polylines[id] = polyline;
 // }
 
+  void updatePolyLine(double sLat,double sLong,double eLat,double eLong){
 
-  Widget Map(context){
+    if(sLat != null && sLong != null && eLat != null && eLong != null){
+      print("checking before set state");
+      setState(() {
 
-  return Expanded(
-    child: Container(
-      height: MediaQuery.of(context).size.height/2,
-      width: MediaQuery.of(context).size.width,
-      child: GoogleMap(
-        myLocationEnabled: true,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(24.8674,67.1962),
-          zoom: 15,
+
+      p1 = p1.copyWith(pointsParam: [LatLng(sLat, sLong),LatLng(eLat, eLong)],
+      visibleParam: true);
+      });
+    }
+    else{
+      print("checking after ^^^^6 set state");
+    }
+
+  }
+
+  void updateMarkerPositionM1(double lat, double long) {
+    print('Updating marker position M1 to lat: $lat, long: $long');
+    setState(() {
+      m1 = m1.copyWith(positionParam: LatLng(lat, long),
+      visibleParam: true);
+    });
+    print('Marker M1 position updated');
+  }
+
+  void updateMarkerPositionM2(double lat, double long) {
+    print("%%%%%%%%%%%%%%%%%%%%%%%");
+    setState(() {
+      m2 = m2.copyWith(positionParam: LatLng(lat, long),
+          visibleParam: true);
+    });
+  }
+  Widget Map(context) {
+
+
+    return Expanded(
+      child: Container(
+        height: MediaQuery
+            .of(context)
+            .size
+            .height / 2,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
+        child: GoogleMap(
+          myLocationEnabled: true,
+          initialCameraPosition: CameraPosition(
+            target: LatLng(24.8674, 67.1962),
+            zoom: 15,
+          ),
+          // *****
+
+            polylines: {
+            p1
+
+          },
+          // ********
+          markers: {m1,m2}
+            // Marker(
+            //   markerId: MarkerId("marker1"),
+            //   position: LatLng(24.8674, 67.2),
+            //   draggable: false,
+            //   visible: marker1Visibility,
+            //   icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            //     ),
+            // Marker(
+            //   markerId: MarkerId("marker2"),
+            //   position: LatLng(24.8674, 67.1962),
+            //   icon: BitmapDescriptor.defaultMarkerWithHue(
+            //       BitmapDescriptor.hueGreen),
+            // )
+
         ),
-        // *****
-
-      //   polylines: {
-      //     Polyline(
-      //       polylineId: PolylineId("poly"),
-      //         points: [LatLng(startLat!,startLong!),LatLng(24.867646307371512, 67.19455220974876)],
-      //         color: hexToColor("#1E847F"),
-      //
-      //     )
-      // },
-        // ********
-        // markers: {
-        //   Marker(
-        //     markerId: MarkerId("marker1"),
-        //     position: LatLng(24.8674, 67.2),
-        //     draggable: false,
-        //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        //       ),
-        //   Marker(
-        //     markerId: MarkerId("marker2"),
-        //     position: LatLng(24.8674,67.1962),
-        //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        //   )
-        // },
       ),
-    ),
-  );
+    );
   }
 
 
-
-Container locationBox(context){
-  return Container(
-    decoration: BoxDecoration(
-      color: hexToColor("#1E1E1E"),
-    ),
-    child:
-    Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          child: Row(
-          children: [
-            Padding(padding: EdgeInsets.all(10),
-            child: Icon(Icons.location_pin,color: Colors.red,)
-              ,),
-            Expanded(
-                child: TextField(
+  Container locationBox(context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: hexToColor("#1E1E1E"),
+      ),
+      child:
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            child: Row(
+              children: [
+                Padding(padding: EdgeInsets.all(10),
+                  child: Icon(Icons.location_pin, color: Colors.red,)
+                  ,),
+                Expanded(
+                    child: TextField(
+                      showCursor: true,
+                      readOnly: true,
+                      // autofocus: false,
+                      controller: startlocation,
+                      style: TextStyle(
+                          color: Colors.white
+                      ),
+                      decoration: InputDecoration(
+                        // enabled: false,
+                          hintText: "Start Location",
+                          hintStyle: TextStyle(
+                              color: Colors.grey
+                          )
+                      ),
+                      onTap: () async {
+                        startLocationCo = await Navigator.push(context,
+                            MaterialPageRoute(
+                                builder: (context) => LocationScreen()));
+                        print("*** startlocation = ${startLocationCo} ***");
+                        startLat = double.parse(startLocationCo[0]);
+                        startLong = double.parse(startLocationCo[1]);
+                        startName = startLocationCo[2];
+                        if (startName != null) {
+                          print(
+                              "!!!!!!!!!! ${startName} ==== ${startLat} ${startLong}======}");
+                          startlocation.text = startName!;
+                          // print(IDID);
+                          // m1 = m1.copyWith(positionParam: LatLng(startLat!, startLong!),visibleParam: true);
+                          updateMarkerPositionM1(startLat!, startLong!);
+                          updatePolyLine(startLat!, startLong!, endLat!, endLong!);
+                        }
+                      },
+                    )
+                )
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
+          Container(
+            child: Row(
+              children: [
+                Padding(padding: EdgeInsets.all(10),
+                  child: Icon(Icons.location_pin, color: Colors.green,)
+                  ,),
+                Expanded(child: TextField(
                   showCursor: true,
                   readOnly: true,
-                  // autofocus: false,
-                controller: startlocation,
-                style: TextStyle(
-                  color: Colors.white
-                ),
-                decoration: InputDecoration(
-                  // enabled: false,
-                hintText: "Start Location",
-                hintStyle: TextStyle(
-                    color: Colors.grey
-                 )
-               ),
-                  onTap: () async {
-                  startLocationCo = await Navigator.push(context,
-                      MaterialPageRoute(
-                          builder: (context)=>LocationScreen()));
-                          print("*** startlocation = ${startLocationCo} ***");
-                          startLat = double.parse(startLocationCo[0]);
-                          startLong = double.parse(startLocationCo[1]);
-                          startName = startLocationCo[2];
-                          if(startName != null){
-
-                            print("!!!!!!!!!! ${startName} ==== ${startLat} ======}");
-                            startlocation.text= startName!;
-                            print(IDID);
-                          }
-                        },
+                  controller: endlocation,
+                  style: TextStyle(
+                      color: Colors.white
+                  ),
+                  decoration: InputDecoration(
+                      hintText: "End Location",
+                      hintStyle: TextStyle(
+                          color: Colors.grey
                       )
-                    )
-                  ],
-                ),
+                  ),
+                  onTap: () async {
+                    endLocationCo = await Navigator.push(context,
+                        MaterialPageRoute(
+                            builder: (context) => LocationScreen()));
+                    print("*** endlocation = ${endLocationCo} ***");
+                    endLat = double.parse(endLocationCo[0]);
+                    endLong = double.parse(endLocationCo[1]);
+                    endName = endLocationCo[2];
+                    if (endName != null) {
+                      print("!!!!!!!!!! ${endName} ==== ${endLat} ==tartLong}");
+                      endlocation.text = endName!;
+                      updateMarkerPositionM2(endLat!, endLong!);
+                      updatePolyLine(startLat!, startLong!, endLat!, endLong!);
+                    }
+                  },
+                )
+                )
+              ],
             ),
-        SizedBox(height: 10),
-        Container(
-          child: Row(
-            children: [
-              Padding(padding: EdgeInsets.all(10),
-                child: Icon(Icons.location_pin,color: Colors.green,)
-                ,),
-              Expanded(child: TextField(
-                showCursor: true,
-                readOnly: true,
-                controller: endlocation,
-                style: TextStyle(
-                  color: Colors.white
-                ),
-                decoration: InputDecoration(
-                    hintText: "End Location",
-                    hintStyle: TextStyle(
-                        color: Colors.grey
-                    )
-                ),
-                onTap: () async {
-                  endLocationCo = await Navigator.push(context,
-                      MaterialPageRoute(
-                          builder: (context)=>LocationScreen()));
-                  print("*** endlocation = ${endLocationCo} ***");
-                  endLat = double.parse(endLocationCo[0]);
-                  endLong = double.parse(endLocationCo[1]);
-                  endName = endLocationCo[2];
-                  if(endName != null){
-
-                    print("!!!!!!!!!! ${endName} ==== ${endLat} ==tartLong}");
-                    endlocation.text= endName!;
-                  }
-                },
-              )
-              )
-            ],
           ),
-        ),
-        SizedBox(height: 10),
-        ElevatedButton(onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> lastScreen()));
-        },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: hexToColor("#1E847F"),
-              fixedSize: Size(130,40),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15)
-              )
-            ),
-            child:
+          SizedBox(height: 10),
+          ElevatedButton(onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => lastScreen()));
+          },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: hexToColor("#1E847F"),
+                  fixedSize: Size(130, 40),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)
+                  )
+              ),
+              child:
               Text("Proceed")),
-        SizedBox(height: 10),
-      ],
-    ),
-  );
+          SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+
 }
+
+
 
 
 Widget modeSelector(){
