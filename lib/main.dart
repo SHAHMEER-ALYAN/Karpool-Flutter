@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +12,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  final prefs = await SharedPreferences.getInstance();
+  //final prefs = await SharedPreferences.getInstance();
   runApp(MyApp());
 }
 
 DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
 
-TextEditingController nameController = TextEditingController();
+TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 
 class MyApp extends StatelessWidget {
@@ -104,7 +105,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
           Align(
             alignment: Alignment.centerLeft,
             child: const Text(
-              "Phone Number",
+              "Email",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -113,10 +114,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
             ),
           ),
           TextField(
-            controller: nameController,
+            controller: emailController,
             style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: "Enter Phone Number",
+              hintText: "Enter Your Email",
               hintStyle: TextStyle(color: hexToColor("#777777")),
               border: const UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.black)),
@@ -161,9 +162,15 @@ class _MyLoginPageState extends State<MyLoginPage> {
           checkboxWidget(),
           ElevatedButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>home()));
-              // Call the loginUser function here
-              loginUser();
+             /* if(!email.text.contains("@")){
+              displayToastMessage("Email address is not valid", context);
+              }
+              else if(password.text.length<7){
+                displayToastMessage("Password is mandatory", context);
+              }*/
+              //else {
+                loginUser(context);
+               //}
             },
             child: const Text("LOGIN"),
             style: ElevatedButton.styleFrom(
@@ -208,7 +215,41 @@ class _MyLoginPageState extends State<MyLoginPage> {
   }
 
   // Move the loginUser function outside of the build method
-  void loginUser() async {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    void loginUser(BuildContext context) async{
+
+      final User? firebaseUser = (await _firebaseAuth
+          .signInWithEmailAndPassword(
+          email: email.text,
+          password: password.text
+      ).catchError((errMsg){
+        displayToastMessage("Error: "+errMsg.toString(), context);
+      })).user;
+
+      if(firebaseUser != null  )
+      {
+
+        usersRef.child(firebaseUser.uid).once()
+            .then((value) => (DataSnapshot snap){
+          if(snap.value != null){
+            Navigator.pushNamedAndRemoveUntil(context, MyHomePage.idScreen, (route) => false);
+            displayToastMessage("you are logged in successfully", context);
+          }
+
+          else{
+            _firebaseAuth.signOut();
+            displayToastMessage("User does not exist. Please create new account.", context);
+          }
+        });
+
+      }
+      else
+      {
+        displayToastMessage("Error Occurred, can not be signed in", context);
+      }
+
+    }
+  /*void loginUser() async {
     dynamic responseJson;
     String userId = '';
     String errorMessage = '';
@@ -291,7 +332,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
         errorMessage = 'Error connecting to the server';
       });
     }
-  }
+  }*/
 
 }
   Color hexToColor(String hexColor) {

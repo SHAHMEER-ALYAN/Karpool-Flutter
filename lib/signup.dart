@@ -143,6 +143,7 @@ void registerNewUser(BuildContext context) async{
       "name" : name.text.trim(),
       "email" : email.text.trim(),
       "phone" : phone.text.trim(),
+      "password" : password.text.trim()
     };
 
     usersRef.child(firebaseUser.uid).set(userDataMap);
