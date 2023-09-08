@@ -1,19 +1,77 @@
+import 'dart:convert';
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'home.dart';
 
-class Contact {
-  final String name;
-  final String phoneNumber;
-  final String address;
+Future<List<Map<String, dynamic>>> getRoutesWithZeroOrNegativeDistance() async {
+  final DatabaseReference routesRef = FirebaseDatabase.instance.reference().child("Routes");
+  final List<Map<String, dynamic>> matchingRoutes = [];
 
-  Contact({
-    required this.name,
-    required this.phoneNumber,
-    required this.address,
+  DatabaseReference RouteRef =
+  FirebaseDatabase.instance.ref('Routes');
+  RouteRef.onValue.listen((DatabaseEvent event) {
+    final data = event.snapshot.value;
+    matchingRoutes.add(data) as Map<String,dynamic>;
   });
+
+  final dynamic routesData = routesRef.startAt("startLat");
+  if(routesData==Double){
+    double num = routesData.value;
+    print(num);
+  }
+  // print(dss);
+  // dss.asStream().forEach((value) {
+  //   final double startLatdb = value["startLat"];
+  //   final double startLongdb = value["startLong"];
+  //   final double endLatdb = value["endLat"];
+  //   final double endLongdb = value["endLong"];
+  //
+  // })
+
+  DataSnapshot dataSnapshot;
+  try {
+    dataSnapshot = (await routesRef.once()) as DataSnapshot;
+  } catch (e) {
+    print("Error reading data from Firebase: $e");
+    return matchingRoutes;
+  }
+
+  if (dataSnapshot.value != null) {
+    final dynamic routesData = dataSnapshot.value;
+    if (routesData is Map<dynamic, dynamic>) {
+      routesData.forEach((key, value) {
+        if (value is Map<String, dynamic>) {
+          final double startLatdb = value["startLat"];
+          final double startLongdb = value["startLong"];
+          final double endLatdb = value["endLat"];
+          final double endLongdb = value["endLong"];
+
+          final double startdistance = Geolocator.distanceBetween(
+            startLatdb, startLongdb, startLat!, startLat!,
+          );
+          final double enddistance = Geolocator.distanceBetween(
+            endLatdb, endLongdb, endLat!, endLong!,
+          );
+
+          if (startdistance <= 10 && enddistance<= 10) {
+            matchingRoutes.add(value);
+          }
+        }
+      });
+    }
+  }
+
+  return matchingRoutes;
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(lastScreen());
 }
 
@@ -21,97 +79,47 @@ class lastScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ContactListScreen(),
-    );
-  }
-}
-
-class ContactListScreen extends StatelessWidget {
-  final List<Contact> contacts = [
-    Contact(name: 'John Doe', phoneNumber: '+1234567890', address: '123 Main St'),
-    // Add more contacts here
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Contact List'),
-      ),
-      body: ListView.builder(
-        itemCount: contacts.length,
-        itemBuilder: (context, index) {
-          final contact = contacts[index];
-          return ContactCard(contact: contact);
-        },
-      ),
-    );
-  }
-}
-
-class ContactCard extends StatelessWidget {
-  final Contact contact;
-
-  ContactCard({required this.contact});
-
-  void _launchWhatsApp() async {
-    final url = 'https://api.whatsapp.com/send?phone=${contact.phoneNumber}';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch WhatsApp';
-    }
-  }
-
-  void _launchPhoneCall() async {
-    final url = 'tel:${contact.phoneNumber}';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch phone call';
-    }
-  }
-
-  void _launchSms() async {
-    final url = 'sms:${contact.phoneNumber}';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch SMS';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.all(16.0),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Name: ${contact.name}'),
-            Text('Phone Number: ${contact.phoneNumber}'),
-            Text('Address: ${contact.address}'),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.call),
-                  onPressed: _launchPhoneCall,
-                ),
-                IconButton(
-                  icon: Icon(Icons.message),
-                  onPressed: _launchSms,
-                ),
-                IconButton(
-                  icon: Icon(Icons.message),
-                  onPressed: _launchWhatsApp,
-                ),
-              ],
-            ),
-          ],
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Matching Routes'),
+        ),
+        body: FutureBuilder<List<Map<String, dynamic>>>(
+          future: getRoutesWithZeroOrNegativeDistance(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Text('No matching routes found.'),
+              );
+            } else {
+              final matchingRoutes = snapshot.data;
+              return ListView.builder(
+                itemCount: matchingRoutes!.length,
+                itemBuilder: (context, index) {
+                  final route = matchingRoutes![index];
+                  return ListTile(
+                    title: Text('Route $index'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Start Latitude: ${route["startLatitude"]}'),
+                        Text('Start Longitude: ${route["startLongitude"]}'),
+                        Text('End Latitude: ${route["endLatitude"]}'),
+                        Text('End Longitude: ${route["endLongitude"]}'),
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
+          },
         ),
       ),
     );
