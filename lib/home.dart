@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,6 +14,10 @@ import 'last_screen.dart';
 void main() {
   runApp(home());
 }
+
+final DatabaseReference databaseReference = FirebaseDatabase.instance.ref("Route");
+
+
 var startLocationCo;
 var endLocationCo;
 TextEditingController startlocation = TextEditingController();
@@ -30,6 +35,19 @@ bool passenger=true;
 bool marker1Visibility= false;
 
 
+// void addRouteToDatabase(double slat, double slong,double elat, double elong, bool pass,String id) {
+//   try {
+//     // Generate a new unique route ID
+//     String? newRouteKey = databaseReference.child('routes').push().key;
+//
+//     // Set the route data under the 'routes' node with the unique key
+//     // databaseReference.child('routes').child(newRouteKey!).set(route.toJson());
+//
+//     print('Route added successfully.');
+//   } catch (error) {
+//     print('Error adding route: $error');
+//   }
+// }
 
 Marker m1 = Marker(
 markerId: MarkerId("marker1"),
@@ -340,9 +358,25 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           SizedBox(height: 10),
-          ElevatedButton(onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => lastScreen()));
+          ElevatedButton(onPressed: () async {
+            if(startLat!=null && startLong!=null && endLat!=null && endLong!=null ) {
+              // String? newRouteKey = databaseReference.child('routes').push().key;
+              // await databaseReference.child(newRouteKey!).set({
+              //
+              //   "UID": userId,
+              //   "startLat": startLat,
+              //   "startLong": startLong,
+              //   "endLat": endLat,
+              //   "endLong": endLong,
+              //   "passenger": passenger,
+              //
+              // });
+              Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => lastScreen()));
+            }
+
+            // Navigator.push(
+            //     context, MaterialPageRoute(builder: (context) => lastScreen()));
           },
               style: ElevatedButton.styleFrom(
                   backgroundColor: hexToColor("#1E847F"),

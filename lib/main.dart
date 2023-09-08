@@ -18,7 +18,7 @@ Future<void> main() async {
 
 DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
 final FirebaseAuth _auth = FirebaseAuth.instance;
-String _userId = '';
+String userId = '';
 
 TextEditingController emailMainController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
@@ -231,18 +231,18 @@ class _MyLoginPageState extends State<MyLoginPage> {
         if (user != null) {
           setState(() {
             // print("%%%%%%%%%%% ${user.uid}");
-            _userId = 'User ID: ${user.uid}';
+            userId = user.uid;
             Navigator.pushNamedAndRemoveUntil(context, MyHomePage.idScreen, (route) => false);
 
           });
         } else {
           setState(() {
-            _userId = 'User not found';
+            userId = 'User not found';
           });
         }
       } catch (e) {
         setState(() {
-          _userId = 'Error: $e';
+          userId = 'Error: $e';
         });
       }
 
