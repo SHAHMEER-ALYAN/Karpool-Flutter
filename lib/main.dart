@@ -17,6 +17,8 @@ Future<void> main() async {
 }
 
 DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
+final FirebaseAuth _auth = FirebaseAuth.instance;
+String _userId ='';
 
 TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
@@ -216,12 +218,41 @@ class _MyLoginPageState extends State<MyLoginPage> {
 
   // Move the loginUser function outside of the build method
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  void loginUser(BuildContext context) async{
+    try {
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      final user = userCredential.user;
+      if (user != null) {
+        setState(() {
+          // print("%%%%%%%%%%% ${user.uid}");
+          _userId = 'User ID: ${user.uid}';
+          Navigator.pushNamedAndRemoveUntil(
+              context, MyHomePage.idScreen, (route) => false);
+        });
+      } else {
+        setState(() {
+          _userId = 'User not found';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _userId = 'Error: $e';
+      });
+    }
+  }
+
+  /*final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
     void loginUser(BuildContext context) async{
 
       final User? firebaseUser = (await _firebaseAuth
           .signInWithEmailAndPassword(
-          email: email.text,
-          password: password.text
+          email: emailController.text,
+          password: passwordController.text
       ).catchError((errMsg){
         displayToastMessage("Error: "+errMsg.toString(), context);
       })).user;
@@ -249,91 +280,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
       }
 
     }
-  /*void loginUser() async {
-    dynamic responseJson;
-    String userId = '';
-    String errorMessage = '';
-
-    final String url = 'http://10.0.2.2/practice_api/check.php'; // Replace with your PHP script's URL
-
-    final response = await http.post(
-      Uri.parse(url),
-      body: {
-        'name': nameController.text,
-        'password': passwordController.text,
-      },
-    );
-    print("--------------------");
-
-    if (response.statusCode == 200) {
-      try {
-        // Extract the JSON string from the response
-        final jsonString = response.body.substring(response.body.indexOf('{'));
-        responseJson = jsonDecode(jsonString);
-        if (responseJson != null && responseJson['success']) {
-          // Successful response
-          setState(() {
-            userId = 'User ID: ${responseJson['userId']}';
-
-          });
-          print("################ $userId");
-          // Navigate to the home screen
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => home()),
-          // );
-          print("After navigation====");
-        } else {
-          setState(() {
-            userId = '';
-            errorMessage = 'Invalid credentials';
-          });
-        }
-      } catch (e) {
-    print("JSON decoding error: $e");
-    // Handle JSON decoding error...
-    }
-
-      if (responseJson['success']) {
-        print("***************");
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          prefs.setString('userId', userId);
-          print(" ******************* ");
-        } catch (e) {
-          print('Error: $e');
-        }
-
-        // final prefs = await SharedPreferences.getInstance();
-        // prefs.setString('userId', userId);
-        // print("before nav");
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => home()),
-        );
-        setState(() async {
-          userId = 'User ID: ${responseJson['userId']}';
-        });
-        // final prefs = await SharedPreferences.getInstance();
-        // prefs.setString('userId', userId);
-
-        // Navigate to the home screen
-
-        print("After navigation");
-      } else {
-        setState(() {
-          userId = '';
-          errorMessage = 'Invalid credentials';
-        });
-      }
-    } else {
-      setState(() {
-        userId = '';
-        errorMessage = 'Error connecting to the server';
-      });
-    }
-  }*/
-
+  */
 }
   Color hexToColor(String hexColor) {
     return Color(int.parse(hexColor.substring(1, 7), radix: 16) + 0xFF000000);
