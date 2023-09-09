@@ -8,30 +8,24 @@ import 'package:firebase_database/firebase_database.dart';
 import 'home.dart';
 
 Future<List<Map<String, dynamic>>> getRoutesWithZeroOrNegativeDistance() async {
-  final DatabaseReference routesRef = FirebaseDatabase.instance.reference().child("Routes");
+  final DatabaseReference routesRef = FirebaseDatabase.instance.ref().child("Route");
   final List<Map<String, dynamic>> matchingRoutes = [];
 
-  DatabaseReference RouteRef =
-  FirebaseDatabase.instance.ref('Routes');
-  RouteRef.onValue.listen((DatabaseEvent event) {
-    final data = event.snapshot.value;
-    matchingRoutes.add(data) as Map<String,dynamic>;
-  });
+
+
+  routesRef.onValue.listen((DatabaseEvent event)
+  {final data = Map<String, dynamic>.from(event.snapshot.value! as Map<Object?, Object?>); // Access the data from the event snapshot
+
+  matchingRoutes.add(data);
+    }
+    );
+
 
   final dynamic routesData = routesRef.startAt("startLat");
   if(routesData==Double){
     double num = routesData.value;
     print(num);
   }
-  // print(dss);
-  // dss.asStream().forEach((value) {
-  //   final double startLatdb = value["startLat"];
-  //   final double startLongdb = value["startLong"];
-  //   final double endLatdb = value["endLat"];
-  //   final double endLongdb = value["endLong"];
-  //
-  // })
-
   DataSnapshot dataSnapshot;
   try {
     dataSnapshot = (await routesRef.once()) as DataSnapshot;
@@ -57,9 +51,9 @@ Future<List<Map<String, dynamic>>> getRoutesWithZeroOrNegativeDistance() async {
             endLatdb, endLongdb, endLat!, endLong!,
           );
 
-          if (startdistance <= 10 && enddistance<= 10) {
+          //if (startdistance <= 10 && enddistance<= 10) {
             matchingRoutes.add(value);
-          }
+          //}
         }
       });
     }
