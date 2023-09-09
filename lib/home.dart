@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import "package:google_maps_flutter/google_maps_flutter.dart";
 import "main.dart";
 import "package:toggle_switch/toggle_switch.dart";
+import 'getNearByDrivers.dart';
 import 'last_screen.dart';
 
 void main() {
@@ -16,6 +17,7 @@ void main() {
 }
 
 final DatabaseReference databaseReference = FirebaseDatabase.instance.ref("Route");
+final DatabaseReference tripReqReference = FirebaseDatabase.instance.ref().child("users").child(userId).child("newRide");
 
 
 var startLocationCo;
@@ -297,7 +299,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () async {
                         startLocationCo = await Navigator.push(context,
                             MaterialPageRoute(
-                                builder: (context) => LocationScreen()));
+                                builder: (context) =>
+                                    LocationScreen()
+                            ));
                         print("*** startlocation = ${startLocationCo} ***");
                         startLat = double.parse(startLocationCo[0]);
                         startLong = double.parse(startLocationCo[1]);
@@ -360,19 +364,22 @@ class _MyHomePageState extends State<MyHomePage> {
           SizedBox(height: 10),
           ElevatedButton(onPressed: () async {
             if(startLat!=null && startLong!=null && endLat!=null && endLong!=null ) {
-              // String? newRouteKey = databaseReference.child('routes').push().key;
-              // await databaseReference.child(newRouteKey!).set({
-              //
-              //   "UID": userId,
-              //   "startLat": startLat,
-              //   "startLong": startLong,
-              //   "endLat": endLat,
-              //   "endLong": endLong,
-              //   "passenger": passenger,
-              //
-              // });
+               String? newRouteKey = databaseReference.child('routes').push().key;
+              await databaseReference.child(newRouteKey!).set({
+
+                "UID": userId,
+                "startLat": startLat,
+                "startLong": startLong,
+                "endLat": endLat,
+                "endLong": endLong,
+                "passenger": passenger,
+
+              });
               Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => lastScreen()));
+                      context, MaterialPageRoute(builder: (context) =>
+                  lastScreen()
+              //nearBypool()
+              ));
             }
 
             // Navigator.push(
